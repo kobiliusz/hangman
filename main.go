@@ -41,7 +41,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	text.Draw(screen, g.message, typeface, 10, 650, col)
 }
 
-func (g *Game) Layout(w, h int) (int, int) {
+func (g *Game) Layout(_, _ int) (int, int) {
 	return width, height
 }
 

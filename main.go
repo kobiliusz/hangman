@@ -10,6 +10,7 @@ import (
 	"golang.org/x/image/font/opentype"
 	"image/color"
 	"log"
+	"math/rand"
 	"slices"
 	"strings"
 	"unicode"
@@ -17,6 +18,9 @@ import (
 
 //go:embed assets/*
 var assets embed.FS
+
+//go:embed assets/dict.txt
+var wordsFile string
 
 const width = 350
 const height = 750
@@ -131,8 +135,17 @@ func (g *Game) Guess(c rune) {
 }
 
 func getWord() string {
-	//TODO
-	return "TUSIDELEC"
+	words := getWordList()
+	index := rand.Intn(len(words))
+	return strings.ToUpper(words[index])
+}
+
+func getWordList() []string {
+	words := make([]string, 0)
+	for _, line := range strings.Split(wordsFile, "\n") {
+		words = append(words, strings.TrimSpace(line))
+	}
+	return words
 }
 
 func main() {

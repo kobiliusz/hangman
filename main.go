@@ -4,6 +4,7 @@ import (
 	"embed"
 	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
@@ -39,6 +40,40 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	text.Draw(screen, g.answer, typeface, 10, 620, col)
 	text.Draw(screen, g.message, typeface, 10, 650, col)
+
+	ebitenutil.DrawRect(screen, 50, 600, 250, 10, col)
+	ebitenutil.DrawRect(screen, 100, 200, 20, 400, col)
+	ebitenutil.DrawRect(screen, 100, 200, 150, 20, col)
+	ebitenutil.DrawRect(screen, 240, 220, 10, 40, col)
+
+	x := 245.0
+	y := 260.0
+
+	if g.chances <= 5 {
+		// Głowa (koło)
+		ebitenutil.DrawCircle(screen, x, y+20, 20, col)
+		ebitenutil.DrawCircle(screen, x, y+20, 18, color.Black)
+	}
+	if g.chances <= 4 {
+		// Tułów (linia w dół)
+		ebitenutil.DrawLine(screen, x, y+40, x, y+100, col)
+	}
+	if g.chances <= 3 {
+		// Lewa ręka
+		ebitenutil.DrawLine(screen, x, y+60, x-30, y+80, col)
+	}
+	if g.chances <= 2 {
+		// Prawa ręka
+		ebitenutil.DrawLine(screen, x, y+60, x+30, y+80, col)
+	}
+	if g.chances <= 1 {
+		// Lewa noga
+		ebitenutil.DrawLine(screen, x, y+100, x-25, y+140, col)
+	}
+	if g.chances == 0 {
+		// Prawa noga
+		ebitenutil.DrawLine(screen, x, y+100, x+25, y+140, col)
+	}
 }
 
 func (g *Game) Layout(_, _ int) (int, int) {

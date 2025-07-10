@@ -19,7 +19,7 @@ import (
 var assets embed.FS
 
 const width = 350
-const height = 700
+const height = 750
 
 var typeface = loadFont()
 
@@ -29,17 +29,29 @@ type Game struct {
 	answer  string
 	word    string
 	message string
+	win     bool
 }
 
 func (g *Game) Update() error {
+	if g.chances > 0 && !g.win {
+		chars := ebiten.AppendInputChars(nil)
+		if len(chars) > 0 {
+			g.Guess(chars[0])
+		}
+	} else {
+		if ebiten.IsKeyPressed(ebiten.KeySpace) {
+			g.Init()
+		}
+	}
 	return nil
 }
 
+//goland:noinspection GoDeprecation
 func (g *Game) Draw(screen *ebiten.Image) {
 	col := color.White
 
-	text.Draw(screen, g.answer, typeface, 10, 620, col)
-	text.Draw(screen, g.message, typeface, 10, 650, col)
+	text.Draw(screen, g.answer, typeface, 10, 650, col)
+	text.Draw(screen, g.message, typeface, 10, 680, col)
 
 	ebitenutil.DrawRect(screen, 50, 600, 250, 10, col)
 	ebitenutil.DrawRect(screen, 100, 200, 20, 400, col)
@@ -86,12 +98,14 @@ func (g *Game) Init() {
 	g.word = getWord()
 	g.answer = strings.Repeat("_", len(g.word))
 	g.message = "Start of game."
+	g.win = false
 }
 
 func (g *Game) Guess(c rune) {
 	c = unicode.ToUpper(c)
 	if slices.Contains(g.guessed, c) {
-		g.message = fmt.Sprintf("Already guessed: '%s'", string(c))
+		g.message = fmt.Sprintf("Already guessed:'%s'", string(c))
+		return
 	}
 	g.guessed = append(g.guessed, c)
 	indexes := runeIndexesOfRune(g.word, c)
@@ -107,7 +121,12 @@ func (g *Game) Guess(c rune) {
 		for _, index := range indexes {
 			g.answer = replaceNthRune(g.answer, index, c)
 		}
-		g.message = fmt.Sprintf("Correct: '%s'", string(c))
+		if len(runeIndexesOfRune(g.answer, '_')) > 0 {
+			g.message = fmt.Sprintf("Correct: '%s'", string(c))
+		} else {
+			g.win = true
+			g.message = "Win! Press space\nfor new game"
+		}
 	}
 }
 
